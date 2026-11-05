@@ -1,5 +1,5 @@
 'use strict';
-const CACHE='fsl-cache-v0.6.0';
+const CACHE='fsl-cache-v0.6.2';
 const CORE=['./','./index.html','./app.js','./data.js','./curriculum.js','./learning-insights.js','./styles.css','./exam.html','./exam.js','./exam-data.js','./exam-expansion.js','./exam.css','./manifest.webmanifest','./favicon.svg','./icon-192.png','./icon-512.png'];
 self.addEventListener('install', e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('fsl-cache-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
