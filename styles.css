@@ -234,3 +234,6 @@ pre { margin:10px 0; font-size:12px; padding:15px; border-radius:12px; color:#38
 .large-type .small-btn,.large-type .secondary-btn,.large-type .ghost-btn,.large-type .primary-btn { font-size:15px;min-height:45px }
 #fontSizeButton[aria-pressed="true"] { background:#e1edf0;color:#315f75;border-color:#b3ced3 }
 @media(max-width:760px){ .header-actions{flex-wrap:wrap;justify-content:flex-end}.large-type .main-nav { grid-template-columns:repeat(3,minmax(0,1fr)) }.large-type .nav-tab { white-space:normal;min-height:52px }.large-type .hero-numbers {gap:9px}.large-type .hero-numbers span {white-space:normal;text-align:center} }
+
+/* A separate Futsuken study path; CEFR navigation remains unchanged. */
+.exam-nav{display:flex;gap:8px;align-items:center;justify-content:center;flex:1;border:1px solid #c8dbdf;background:#edf4f2;color:#286a65;padding:12px 10px;border-radius:14px;font-weight:800;font-size:13px;text-decoration:none;white-space:nowrap}.exam-nav:hover{background:#e4eeea}.exam-nav:focus-visible{outline:3px solid #83addb;outline-offset:2px}

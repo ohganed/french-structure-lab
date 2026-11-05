@@ -19,3 +19,12 @@ Tested 2026-11-05, offline-injected Chromium desktop (1280x850), Chromium mobile
 - On-device iPhone Safari speech availability, home-screen install, offline/online transitions, and backup import from Files.
 - HTTP localhost-based offline Service Worker test was blocked by the test browser's network policy (ERR_BLOCKED_BY_ADMINISTRATOR); this is **not** evidence of an application error or success.
 - GitHub Pages publishing is **not** completed; instructions are supplied separately.
+
+## v0.4.0 additions (2026-11-05)
+
+- New Futsuken path provides 6 grades (4, 3, j2, 2, j1, 1), 12 original items per grade (72 total).
+- Node syntax checks: `app.js`, `exam.js`, `exam-data.js`, `sw.js` passed.
+- Headless Chromium mobile test (390×844) using offline HTML/CSS/JS injection: grade selection, MC error → feedback, next item, correct answer, session summary, learning ledger, grade 1 typed answer, manual rewrite grading. No page errors in tested flows.
+- Static consistency tests: unique IDs and expected per-grade counts.
+- Main CEFR records remain separate; Futsuken progress and logs use distinct keys and are included in exported full backups.
+- Local browser navigation, Service Worker installation, sound and actual iPhone Safari have not yet been verified against live GitHub Pages after publication.
