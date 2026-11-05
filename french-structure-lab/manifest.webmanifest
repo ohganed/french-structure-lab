@@ -1,0 +1,16 @@
+{
+  "id": "./index.html",
+  "name": "French Structure Lab A1–C2",
+  "short_name": "French Lab",
+  "description": "French sentence structure, conjugation, question-first practice and spaced review",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f3ec",
+  "theme_color": "#f6f3ec",
+  "lang": "ja",
+  "icons": [
+    {"src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}
