@@ -71,3 +71,19 @@ v0.4.0の追加ファイルは `exam.html`、`exam.css`、`exam.js`、`exam-data
 ## v0.6.2 — 文法問題の校正と公開（2026-11-06）
 
 前回未公開だった12問の修正を反映し、新たに70問の文法・表記・説明の修正を追加しました。アポストロフ、語形の省略、選択肢と空欄の整合性、条件法過去の助動詞の説明を改善しました。1,200問の問題IDと既存の学習履歴キーは維持しています。詳細は [QA_REPORT_v062.md](./QA_REPORT_v062.md)。全問の専門家校閲が完了したものではありません。
+
+
+## v0.7.0 — Cognition Studio（認知と文法）
+
+- 旧A1〜C2教材、仏検4級〜1級の1,200問を維持し、独立した cognition.html を追加。
+- Albus & Meystel（*Engineering of Mind*, 2001）の参照モデルから「知覚→世界モデル→重要性判断→行動生成→フィードバック」の教材設計を着想。
+- Pecher & Zwaan（編、*Grounding Cognition*, 2005）から、意味と知覚・空間・経験・状況をつなげる場面判断を着想。
+- Chomskyの生成文法から、句・節の階層表示と構文上の依存関係を取り入れる。ただし構文木は学習用の簡略表示。
+- 11ユニット（A1〜C2）。場面判断→文構造→文法選択→別場面への応用。解答前の自信度を保存。
+- 保存キーは既存の french-structure-lab:v1: を使用し、完全バックアップ/AI分析JSONへ追加。
+- これは理論の語学教授効果を検証済みとするものでも、脳の実際の処理を再現したものでもない。正答履歴をCEFRレベル認定に使用しない。
+
+文献：
+- https://www.nist.gov/publications/engineering-mind-introduction-science-intelligent-systems
+- https://www.cambridge.org/core/books/grounding-cognition/E322E21124B7DEB879293E6F64DEC70B
+- https://www.cambridge.org/core/services/aop-cambridge-core/content/view/EB424744392C0A6BBF40671EAF3527FD/9781139524605c2_p25-48_CBO.pdf/universal_grammar_and_the_learning_and_teaching_of_second_languages.pdf
