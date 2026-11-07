@@ -87,3 +87,17 @@ v0.4.0の追加ファイルは `exam.html`、`exam.css`、`exam.js`、`exam-data
 - https://www.nist.gov/publications/engineering-mind-introduction-science-intelligent-systems
 - https://www.cambridge.org/core/books/grounding-cognition/E322E21124B7DEB879293E6F64DEC70B
 - https://www.cambridge.org/core/services/aop-cambridge-core/content/view/EB424744392C0A6BBF40671EAF3527FD/9781139524605c2_p25-48_CBO.pdf/universal_grammar_and_the_learning_and_teaching_of_second_languages.pdf
+
+
+## v0.8.0 — 日本語 / English / Français +（2026-11-07）
+
+- A1〜C2、仏検、認知と文法の3画面に共通の**日本語・英語・フランス語**表示切替を追加。設定キーは従来と同じ `french-structure-lab:v1:lang`。
+- フランス語の「Français + · immersion」は、やや背伸びしたフランス語を読んで状況・文法構造を考える**フランス語優先モード**。補助情報は折りたたまれ、必要なら日本語・英語を開ける。
+- A1〜C2の読解・解説、仏検解答後の文法ヒント、認知スタジオの11ユニットの状況と構造をフランス語優先で表示。
+- 認知スタジオは日本語・英語・フランス語それぞれの11ユニットの場面、構造、転移を表示。フランス語の音声読み上げボタンを追加（端末のWeb Speech対応時）。
+- 統一したインターフェースの翻訳辞書と、文法トピック別のフランス語の観察ポイントを追加。
+- 学習記録、復習間隔、問題ID、CEFR 108問、仏検1,200問は維持。アプリ内の各ページを移動しても選択言語が保持される。
+- **未翻訳の詳細解説を自動翻訳したわけではない。** Français + では独自に校閲・記述した短いフランス語ヒントを表示し、原文の日本語・英語の詳しい説明を開く方式。すべての1,200問に個別のフランス語訳が付いているわけではない。
+- モード選択によって実力判定は変えず、長期的には難易度調整と記録を使った比較評価を目指す。
+
+検証：JavaScript構文、仮想ブラウザでのA1〜C2・仏検の3モード切替、認知スタジオ11ユニット×3モードで計99件の解答操作、学習記録を保持した切り替えを確認。iPhone Safari実機・音声の実機確認は未実施。

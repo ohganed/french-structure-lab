@@ -18,7 +18,7 @@
 <div class="app-shell exam-shell">
 <header class="site-header exam-site-header">
   <a href="./index.html" class="brand-area exam-home" aria-label="French Structure Lab トップに戻る"><span class="brand-symbol" aria-hidden="true">fr<span>.</span></span><span class="brand-title"><strong>French Structure Lab</strong><span>仏検・筆記対策 / Grammar &amp; usage</span></span></a>
-  <div class="header-actions"><span class="saved-status">● この端末に保存</span><button id="examFont" class="language-btn" type="button">A＋</button><button id="examLang" class="language-btn" type="button">EN / 日本語</button></div>
+  <div class="header-actions"><span class="saved-status">● この端末に保存</span><button id="examFont" class="language-btn" type="button">A＋</button><label class="fsl-mode-label" for="examLang">表示言語</label><select id="examLang" class="fsl-mode-select" aria-label="日本語 / English / Français"><option value="ja">日本語</option><option value="en">English</option><option value="fr">Français + · immersion</option></select></div>
 </header>
 <section class="hero exam-hero"><div class="hero-copy"><span class="eyebrow">FUTSUKEN · ORIGINAL PRACTICE</span><h1>文法を理解する。<br>試験で使い分ける。</h1><p>CEFR A1〜C2はそのままに、仏検4級から1級の筆記対策を別の学習軸として育てます。</p></div><div class="exam-hero-side"><b id="examTotal">0</b><span>仏検モードの解答回数</span><small>出題は独自作成・公式過去問ではありません</small></div></section>
 <nav class="exam-navigation" aria-label="仏検メニュー">
@@ -29,9 +29,10 @@
   <button type="button" class="exam-tab" data-page="guide">出題範囲・使い方</button>
 </nav>
 <main id="examContent" tabindex="-1" aria-live="polite"></main>
-<footer class="footer">French Structure Lab · 仏検モード v0.6.2 — <a href="https://apefdapf.org/dapf/info/examens" rel="noopener noreferrer" target="_blank">公式の試験内容を確認</a><br>この教材はAPEFによる公式教材ではなく、独自に作成した学習用問題です。<br>学習記録はブラウザ内に保存され、オンラインで自動共有されません。</footer>
+<footer class="footer">French Structure Lab · 仏検モード v0.8.0 — <a href="https://apefdapf.org/dapf/info/examens" rel="noopener noreferrer" target="_blank">公式の試験内容を確認</a><br>この教材はAPEFによる公式教材ではなく、独自に作成した学習用問題です。<br>学習記録はブラウザ内に保存され、オンラインで自動共有されません。</footer>
 </div>
 <div id="examToast" class="toast" role="status" aria-live="polite"></div>
+<script src="./language-mode.js" defer></script>
 <script src="./exam-data.js" defer></script>
 <script src="./exam-expansion.js" defer></script>
 <script src="./exam.js" defer></script>

@@ -237,3 +237,14 @@ pre { margin:10px 0; font-size:12px; padding:15px; border-radius:12px; color:#38
 
 /* A separate Futsuken study path; CEFR navigation remains unchanged. */
 .exam-nav{display:flex;gap:8px;align-items:center;justify-content:center;flex:1;border:1px solid #c8dbdf;background:#edf4f2;color:#286a65;padding:12px 10px;border-radius:14px;font-weight:800;font-size:13px;text-decoration:none;white-space:nowrap}.exam-nav:hover{background:#e4eeea}.exam-nav:focus-visible{outline:3px solid #83addb;outline-offset:2px}
+
+/* v0.8.0 — shared JA/EN/FR immersion switch */
+.fsl-mode-label{font-size:11px;color:var(--muted);font-weight:730;white-space:nowrap}
+.fsl-mode-select{min-width:151px;max-width:220px;min-height:40px;border:1px solid #c8d5dc;background:#fffefa;color:#2c536a;border-radius:13px;padding:7px 10px;font-size:13px;font-weight:700}
+.fsl-immersion-note{background:#edf5f2;border:1px solid #d6e9de;border-radius:17px;padding:14px 16px;line-height:1.8;color:#295d51;margin:12px 0}
+.fsl-support{border:1px solid #dbe3e6;border-radius:13px;padding:10px 13px;margin:12px 0;background:#ffffff}
+.fsl-support summary{color:#356a82;font-size:13px;font-weight:750;cursor:pointer;list-style:revert}
+.fsl-support div{padding:8px 0;border-top:1px solid #edf0ef;margin-top:8px}
+.fsl-support p{margin:4px 0;font-size:14px;color:var(--ink)}
+.fsl-fr-focus{display:inline-block;background:#e9f3ee;color:#35735e;padding:4px 10px;border-radius:99px;font-weight:750;font-size:12px}
+@media (max-width:660px){.fsl-mode-label{display:none}.fsl-mode-select{min-width:130px;max-width:180px;font-size:12px;padding:8px 5px}}

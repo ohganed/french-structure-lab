@@ -25,7 +25,7 @@
         <label class="header-level" for="levelSelect">LEVEL <select id="levelSelect" aria-label="学習レベル"><option>A1</option><option>A2</option><option selected>B1</option><option>B2</option><option>C1</option><option>C2</option></select></label>
         <span id="savedStatus" class="saved-status" aria-live="polite">● ローカル保存</span>
         <button id="fontSizeButton" class="language-btn" type="button" aria-label="文字サイズ切替" aria-pressed="false">A＋</button>
-        <button id="languageButton" class="language-btn" type="button" aria-label="Switch explanation language">EN / 日本語</button>
+        <label class="fsl-mode-label" for="languageSelect">表示言語</label><select id="languageSelect" class="fsl-mode-select" aria-label="日本語 / English / Français"><option value="ja">日本語</option><option value="en">English</option><option value="fr">Français + · immersion</option></select>
       </div>
     </header>
 
@@ -56,9 +56,10 @@
     </nav>
 
     <main id="content" tabindex="-1" aria-live="polite"></main>
-    <footer class="footer">French Structure Lab <span>v0.7.0</span> · Your learning data stays in this browser. · No account required.</footer>
+    <footer class="footer">French Structure Lab <span>v0.8.0</span> · Your learning data stays in this browser. · No account required.</footer>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./language-mode.js" defer></script>
   <script src="./data.js" defer></script>
   <script src="./curriculum.js" defer></script>
   <script src="./learning-insights.js" defer></script>
