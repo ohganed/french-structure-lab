@@ -104,11 +104,11 @@ if(btn.dataset.choice!==undefined){
 if(btn.id==="cogNext"){if(active.step!==1&&active.selected===null)return;active.step=Math.min(4,active.step+1);active.selected=null;active.confidence="medium";persist();render();return}
 if(btn.id==="cogReset"){active.step=0;active.selected=null;active.confidence="medium";persist();render();return}
 if(btn.id==="cogFont"){save("largeText",!read("largeText",false));render();return}
-if(btn.id==="cogHear"){if(typeof window.speechSynthesis==="undefined"||typeof SpeechSynthesisUtterance==="undefined"){alert(tr("このブラウザでは音声を利用できません","Speech is not available here","La lecture vocale n’est pas disponible ici"));return}var u=new SpeechSynthesisUtterance(FSL_IMMERSION.scene(current().id,FSL_COG_LANG.loc(current(),"scene","fr"),current().level,immersionHistory(current().level)));u.lang="fr-FR";u.rate=0.87;window.speechSynthesis.cancel();window.speechSynthesis.speak(u);return}
+if(btn.id==="cogHear"){if(typeof window.speechSynthesis==="undefined"||typeof SpeechSynthesisUtterance==="undefined"){alert(tr("このブラウザでは音声を利用できません","Speech is not available here","La lecture vocale n’est pas disponible ici"));return}if(window.FSL_AUDIO){window.FSL_AUDIO.play(FSL_IMMERSION.scene(current().id,FSL_COG_LANG.loc(current(),"scene","fr"),current().level,immersionHistory(current().level)),"fr-FR",btn);return}var u=new SpeechSynthesisUtterance(FSL_IMMERSION.scene(current().id,FSL_COG_LANG.loc(current(),"scene","fr"),current().level,immersionHistory(current().level)));u.lang="fr-FR";u.rate=0.87;window.speechSynthesis.cancel();window.speechSynthesis.speak(u);return}
 if(btn.id==="cogDownload"){
  var data={schemaVersion:"1.0",type:"fsl-cognition-record",exportedAt:new Date().toISOString(),attempts:log,active:active};var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="french-cognition-history.json";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},2000);
 }
 });
 persist();render();
 })();
-</script></body></html>
+</script><script src="./audio.js"></script></body></html>
