@@ -248,3 +248,14 @@ pre { margin:10px 0; font-size:12px; padding:15px; border-radius:12px; color:#38
 .fsl-support p{margin:4px 0;font-size:14px;color:var(--ink)}
 .fsl-fr-focus{display:inline-block;background:#e9f3ee;color:#35735e;padding:4px 10px;border-radius:99px;font-weight:750;font-size:12px}
 @media (max-width:660px){.fsl-mode-label{display:none}.fsl-mode-select{min-width:130px;max-width:180px;font-size:12px;padding:8px 5px}}
+
+/* v0.9: differentiated French immersion guidance, visible in Français+ only */
+[hidden]{display:none!important}
+.fsl-depth-toolbar{display:grid;grid-template-columns:minmax(190px,1fr) minmax(150px,260px);align-items:center;gap:8px 16px;margin:10px 0 17px;padding:15px 17px;border:1px solid #c9dfd6;background:#edf5f0;border-radius:17px}
+.fsl-depth-toolbar label{font-size:14px;font-weight:760;color:#326459}
+.fsl-depth-toolbar select{background:#fff;border:1px solid #9db7ae;border-radius:11px;padding:10px 12px;color:#245a4e;min-width:0;max-width:100%;font-size:14px}
+.fsl-depth-status{grid-column:1/-1;color:#24584d;font-weight:700;font-size:14px;line-height:1.6}
+.fsl-depth-toolbar small{grid-column:1/-1;color:#52766a;font-size:12px;line-height:1.5}
+.fsl-immersion-level-hint{border-top:1px solid #d4e5de;margin-top:10px!important;padding-top:10px;color:#245e54}
+.fsl-immersion-note{line-height:1.9}
+@media(max-width:640px){.fsl-depth-toolbar{grid-template-columns:1fr;padding:12px}.fsl-depth-status,.fsl-depth-toolbar small{grid-column:1}.fsl-depth-toolbar select{width:100%}}

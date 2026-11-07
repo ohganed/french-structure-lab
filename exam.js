@@ -17,7 +17,13 @@
   if(!validGrade(state.grade))state.grade='2';
   const ja=()=>state.lang==='ja';
   const tx=(jp,en,fr)=>FSL_LANG.t(jp,en,fr,state.lang);
-  const explain=q=>state.lang==='fr'?`<div class="fsl-immersion-note" lang="fr">${esc(FSL_LANG.tip(q.topic,q.cefr))}</div>${FSL_LANG.support(q.whyJa,q.whyEn)}`:`${explain(q)}`;
+  const immersionHistory = grade => state.attempts.filter(a=>a && a.grade===grade && typeof a.correct==='boolean');
+  const explanationLevel = q => FSL_IMMERSION.levelForGrade(q.grade);
+  const explain = q => {
+    if(state.lang!=='fr')return `<p class="explanation">${esc(ja()?q.whyJa:q.whyEn)}</p>`;
+    const hint=FSL_IMMERSION.hint(q.topic,explanationLevel(q),immersionHistory(q.grade));
+    return `<div class="fsl-immersion-note" lang="fr"><span class="fsl-fr-focus">${esc(hint.target)}</span> ${esc(hint.text)}</div>${FSL_LANG.support(q.whyJa,q.whyEn)}`;
+  };
   const dateLabel=t=>{const d=new Date(t);return Number.isNaN(+d)?'-':d.toLocaleString(state.lang==='fr'?'fr-FR':ja()?'ja-JP':'en-US',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})};
   function flash(message){const el=$('#examToast');if(!el)return;el.textContent=message;el.classList.add('show');clearTimeout(flash.timer);flash.timer=setTimeout(()=>el.classList.remove('show'),2800)}
   const countGrade=g=>questions.filter(q=>q.grade===g);
@@ -30,6 +36,7 @@
     document.body.classList.toggle('large-type',state.large);
     $('#examTotal').textContent=state.attempts.length;
     FSL_LANG.applySelect('examLang');
+    FSL_IMMERSION.applyToolbar('examImmersionPanel',FSL_IMMERSION.levelForGrade(state.grade),immersionHistory(state.grade),state.lang);
     const hero=document.querySelector('.exam-hero');hero.querySelector('h1').innerHTML=tx('文法を理解する。<br>試験で使い分ける。','Understand grammar.<br>Make the right choice.','Comprendre la grammaire.<br>Choisir la forme juste.');hero.querySelector('.hero-copy p').textContent=tx('CEFR A1〜C2はそのままに、仏検4級から1級の筆記対策を別の学習軸として育てます。','Keep A1–C2, and also prepare for Futsuken grades 4 to 1.','Le parcours A1–C2 reste disponible. Préparez aussi les épreuves du DAPF, du niveau 4 au niveau 1.');hero.querySelector('.exam-hero-side span').textContent=tx('仏検モードの解答回数','Exam answers','Réponses à l’examen');hero.querySelector('.exam-hero-side small').textContent=tx('出題は独自作成・公式過去問ではありません','Original exercises, not official papers','Exercices originaux, non officiels');
     document.querySelectorAll('.exam-navigation a').forEach(a=>{a.textContent=a.getAttribute('href').includes('cognition')?tx('◈ 認知と文法','◈ Cognition & grammar','◈ Cognition et grammaire'):tx('← A1〜C2教材へ','← A1–C2 courses','← Parcours A1–C2')});
     document.querySelectorAll('.exam-navigation button').forEach((b,i)=>b.textContent=[['級別演習','Practice by grade','Entraînement par niveau'],['学習記録','Learning records','Journal'],['出題範囲・使い方','Guide','Guide de l’examen']][i][state.lang==='ja'?0:state.lang==='en'?1:2]);
@@ -158,6 +165,7 @@
   document.querySelectorAll('.exam-tab').forEach(b=>b.addEventListener('click',()=>{if(state.active){if(!confirm(tx('進行中の演習を終了して移動しますか？','End the current session before navigating?')))return;finish(false)}go(b.dataset.page)}));
   $('#examFont').addEventListener('click',()=>{state.large=!state.large;put('largeText',state.large);render()});
   $('#examLang').addEventListener('change',ev=>{if(!FSL_LANG.set(ev.target.value))return;state.lang=FSL_LANG.get();render()});
+  $('#examImmersionPanelSelect').addEventListener('change',ev=>{if(FSL_IMMERSION.setDepth(ev.target.value))render();});
   // Defensive data check: fail visibly rather than silently accepting a malformed item.
   const ids=new Set();for(const q of questions){if(!validGrade(q.grade)||ids.has(q.id)||(q.kind==='choice'&&(!Array.isArray(q.options)||q.options.length!==4||!Number.isInteger(q.answer)||q.answer<0||q.answer>3))){$('#examContent').textContent='教材の構造を確認してください: '+q.id;throw Error('Invalid exam question '+q.id)}ids.add(q.id)}
   // Check all six grade totals so missing expansion files cannot silently reduce the syllabus.

@@ -43,6 +43,7 @@
     </section>
 
     <div class="quick-info" id="quickInfo" aria-live="polite">B1</div>
+    <section id="immersionPanel" class="fsl-depth-toolbar" hidden aria-label="Réglage de la difficulté en immersion"><label for="immersionPanelSelect">Immersion · niveau des explications</label><select id="immersionPanelSelect" aria-label="Difficulté des explications en français"><option value="support">Plus guidé · −1</option><option value="balanced">Au niveau du cours</option><option value="stretch">Un peu plus loin · +1</option><option value="auto">Selon les réponses</option></select><div class="fsl-depth-status" data-immersion-status></div><small data-immersion-proof></small></section>
     <nav class="main-nav" aria-label="Main navigation" id="nav">
       <button class="nav-tab" data-view="courses"><span class="tab-icon">▦</span><span data-ja="A1〜C2教材" data-en="Courses">A1〜C2教材</span></button>
       <button class="nav-tab active" data-view="today"><span class="tab-icon">✦</span><span data-ja="今日の練習" data-en="Practice">今日の練習</span></button>
@@ -56,10 +57,11 @@
     </nav>
 
     <main id="content" tabindex="-1" aria-live="polite"></main>
-    <footer class="footer">French Structure Lab <span>v0.8.0</span> · Your learning data stays in this browser. · No account required.</footer>
+    <footer class="footer">French Structure Lab <span>v0.9.0</span> · Your learning data stays in this browser. · No account required.</footer>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="./language-mode.js" defer></script>
+  <script src="./immersion-levels.js" defer></script>
   <script src="./data.js" defer></script>
   <script src="./curriculum.js" defer></script>
   <script src="./learning-insights.js" defer></script>
