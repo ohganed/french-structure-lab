@@ -296,3 +296,29 @@ pre { margin:10px 0; font-size:12px; padding:15px; border-radius:12px; color:#38
 .fsl-audio-token-row>.fsl-audio-word-bank{flex:0 0 100%}
 .conjugation > div:has(.fsl-audio-word-bank){flex-wrap:wrap}
 .fsl-audio-choice-row>.lesson-btn{flex-direction:column;align-items:stretch}
+
+/* v1.1 — Guided Course Studio */
+.fsl-course-deep{margin:22px 0 20px;padding:17px;border:1px solid #d4e4e2;border-radius:22px;background:#fbfdfb}
+.fsl-course-path{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 16px}
+.fsl-course-path span{font-size:12px;font-weight:750;padding:8px 10px;border-radius:12px;background:#eaf3f4;border:1px solid #d7e6e9;color:#37647a}
+.fsl-course-section{padding:17px 1px;border-top:1px solid #e0e8e4}
+.fsl-course-section h3{font-size:18px;letter-spacing:-.015em;margin:0 0 11px;color:#2e5060}
+.fsl-course-section p{margin:8px 0;line-height:1.95;white-space:pre-wrap}
+.fsl-course-goal{font-size:13px;color:#658078}
+.fsl-course-logic{color:#304d59;font-size:15px}
+.fsl-course-examples{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr));margin:15px 0}
+.fsl-course-example{min-width:0;display:flex;align-items:center;gap:9px;flex-wrap:wrap;min-height:62px;padding:13px 14px;background:#f3f8fb;border:1px solid #dae6eb;border-radius:15px}
+.fsl-course-french{font-family:Georgia,serif;color:#263f52;font-size:17px;line-height:1.85;overflow-wrap:anywhere}
+.course-example-index{font-size:11px;border-radius:6px;background:#dfebef;color:#426a7c;padding:2px 6px}
+.fsl-course-note{font-size:13px;color:#587080}
+.fsl-course-task{font-size:15px;color:#2e5365}
+.fsl-course-draft{display:block;box-sizing:border-box;width:100%;min-height:104px;padding:12px 14px;font-size:16px;line-height:1.7;border:1px solid #c3d7d5;border-radius:13px;background:#fffefa;color:#243b4a;resize:vertical}
+.fsl-course-draft:focus{outline:2px solid #78b0aa;outline-offset:2px}
+.fsl-course-draft-foot{display:flex;gap:9px;align-items:center;justify-content:space-between;margin:8px 0 0;font-size:12px;color:#6a777b}
+.fsl-course-links{border-top:1px solid #e0e8e4;padding:16px 1px 5px}
+.fsl-course-links strong{font-size:13px;color:#536b71}
+.fsl-course-links .actions{margin-top:9px}
+.fsl-course-progress{margin:12px 0 0;text-align:right;font-weight:800;font-size:13px;color:#507b74}
+.fsl-course-listen-mask{min-height:90px;display:flex;align-items:center;justify-content:center;text-align:center;background:repeating-linear-gradient(135deg,#eef3ef,#eef3ef 12px,#e9f2ef 12px,#e9f2ef 24px);border-radius:14px;padding:20px;color:#486861;font-weight:650;line-height:1.75}
+.study-reading .between .actions{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end}
+@media(max-width:680px){.fsl-course-deep{padding:12px;margin:15px 0}.fsl-course-examples{grid-template-columns:1fr}.fsl-course-path{gap:5px}.fsl-course-path span{font-size:11px;padding:7px}.fsl-course-section h3{font-size:16px}.fsl-course-draft-foot{align-items:flex-start;flex-direction:column}.study-reading .between{align-items:flex-start;gap:7px;flex-wrap:wrap}}

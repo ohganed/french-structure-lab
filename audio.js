@@ -8,7 +8,7 @@
   const CHOICE=".option,.cog-choice";
   const SOURCES=[
     ".question.fr",".model-sentence",".reading-text.fr",".reading-text[lang='fr']",
-    ".unit-preview b",".lesson-btn strong",".sentence-line .token",".token-detail strong",
+    ".unit-preview b",".fsl-course-french",".lesson-btn strong",".sentence-line .token",".token-detail strong",
     ".conjugation strong",".conjugation .pills button",".fsl-immersion-note[lang='fr']",
     ".fsl-immersion-level-hint",".exam-model",".cog-scene p",".cog-question",
     ".cog-node span",".cog-nested",".cog-feedback div",".cog-feedback p",

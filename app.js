@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-  const APP_VERSION = '4.1';
+  const APP_VERSION = '4.2';
   const LS = 'french-structure-lab:v1:';
   const $ = (s) => document.querySelector(s);
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -16,7 +16,7 @@
     session:[], sessionIndex:0, sessionAnswer:null, sessionCorrect:0, mode:'daily',
     level:read('level','B1'), selectedUnit:read('unit','a1-greetings'), targetMinutes:read('targetMinutes',15),
     events:read('events',[]), sessions:read('sessions',[]), activeSession:read('activeSession',null),
-    fuzzy:read('fuzzy',{}), readings:read('readings',{}), sessionFinished:false
+    fuzzy:read('fuzzy',{}), readings:read('readings',{}), courseDrafts:read('courseDrafts',{}),courseReadingMasked:false, sessionFinished:false
   };
   const jp = () => state.lang === 'ja';
   const tx = (ja,en,fr) => FSL_LANG.t(ja,en,fr,state.lang);
@@ -165,7 +165,38 @@
     const weak=levelQuestions().filter(q=>state.fuzzy[q.id]||state.progress[q.id]?.lastCorrect===false).slice(0,8);
     $('#content').innerHTML=`<section class="panel"><div class="section-head"><div><p class="kicker">SPACED REVIEW</p><h2>${tx('忘れかけた頃に、もう一度','Return just before you forget')}</h2><p class="subtle">${tx('学習記録はこのブラウザの中だけに保存されます。','Study records stay in this browser.')}</p></div></div><div class="grid3"><div class="info-card"><div class="metric-value">${total}</div><p>${tx('これまでの総解答','Total attempts')}</p></div><div class="info-card"><div class="metric-value">${total?Math.round(correct/total*100):0}%</div><p>${tx('全解答の正答率','Accuracy across attempts')}</p></div><div class="info-card"><div class="metric-value">${due.length}</div><p>${tx('今日の復習待ち','Reviews due today')}</p></div></div><div class="actions"><button class="primary-btn" data-action="start-review" ${!due.length?'disabled':''}>${tx('復習問題を始める','Start due reviews')} (${due.length})</button><button class="secondary-btn" data-action="start-daily">${tx('通常の練習','Regular practice')}</button></div><div class="divider"></div><h3>${tx('直近の苦手項目','Recent trouble spots')}</h3>${weak.length?`<div class="lesson-list" style="margin-top:12px">${weak.map(q=>`<div class="lesson-btn"><strong>${esc(q.sentence)}</strong>${state.lang==='fr'?FSL_LANG.support(q.whyJa,q.whyEn):`<span>${esc(jp()?q.whyJa:q.whyEn)}</span>`}</div>`).join('')}</div>`:`<div class="empty"><strong>${tx('まだ苦手項目はありません','No incorrect answers yet')}</strong>${tx('問題を解くと、ここに復習の手がかりが表示されます。','Study some questions to see relevant review prompts.')}</div>`}<div class="divider"></div><h3>${tx('学習データを外へ持ち出す','Take your learning data with you')}</h3><p class="subtle">${tx('Anki取り込み用CSV、Learning OS連携用のJSON、端末移行用バックアップを出力できます。Learning OSへの自動転送はまだ未接続です。','Export Anki-ready CSV, a Learning OS interchange JSON, or a full backup. Automatic transfer to Learning OS is not connected yet.')}</p><div class="actions"><button class="secondary-btn" data-action="export-anki">${tx('Anki用CSV','Anki CSV')}</button><button class="secondary-btn" data-action="export-cards">${tx('復習カードJSON','Review card JSON')}</button><button class="ghost-btn" data-action="export-backup">${tx('全データのバックアップ','Full backup')}</button></div></section>`;
   }
-  function renderCourses(){
+  const courseTitle=u=>state.lang==='fr'?(u.titleFr||u.titleEn):jp()?u.titleJa:u.titleEn;
+  function courseDeepDive(u){
+    const g=u.guide||{};
+    const mode=state.lang;
+    const l=(ja,en,fr)=>tx(ja,en,fr);
+    const explain=mode==='fr'
+      ? '<p class="fsl-course-logic" lang="fr">'+esc(g.logicFr||u.focusEn)+'</p>'+FSL_LANG.support(g.logicJa||u.focusJa,g.logicEn||u.focusEn)
+      : '<p class="fsl-course-logic">'+esc(mode==='ja'?(g.logicJa||u.focusJa):(g.logicEn||u.focusEn))+'</p>';
+    const pairs=String(g.contrastFr||u.items.slice(0,2).map(x=>x.sentence).join(" / ")).split(/\s+\/\s+/).filter(Boolean);
+    const neighbors=levelUnits(), idx=neighbors.findIndex(x=>x.id===u.id);
+    const links=[neighbors[idx-1],neighbors[idx+1]].filter(Boolean);
+    const examples=pairs.map((v,i)=>'<div class="fsl-course-example"><span class="fsl-course-french" lang="fr">'+esc(v)+'</span><span class="course-example-index">'+(i+1)+'</span></div>').join('');
+    const practice=mode==='fr'?g.taskFr:mode==='en'?(g.taskEn||u.goalEn):g.taskJa;
+    const note=state.courseDrafts[u.id]||'';
+    const study=u.items.filter(q=>state.progress[q.id]?.attempts>0).length;
+    return '<section class="fsl-course-deep" aria-label="Guided learning path">'
+    +'<div class="fsl-course-path"><span>1 · '+l('場面','Context','Contexte')+'</span><span>2 · '+l('文の仕組み','Structure','Structure')+'</span><span>3 · '+l('対比','Contrast','Comparer')+'</span><span>4 · '+l('自分の文','Transfer','Réutiliser')+'</span><span>5 · '+l('演習','Practice','Exercices')+'</span></div>'
+    +'<div class="fsl-course-section"><h3>'+l('文法を組み立てる','Build the grammar','Construire la grammaire')+'</h3>'
+    +'<p class="fsl-course-goal">'+esc(mode==='ja'?u.goalJa:mode==='en'?u.goalEn:g.taskFr)+'</p>'+explain+'</div>'
+    +'<div class="fsl-course-section"><h3>'+l('二つの文を比べる','Compare the examples','Comparer les phrases')+'</h3><div class="fsl-course-examples">'+examples+'</div>'
+    +'<p class="fsl-course-note">'+esc(mode==='fr'?'Observe ce qui change dans la structure et dans le sens.':mode==='en'?(g.contrastJa?g.logicEn:u.focusEn):g.contrastJa||u.focusJa)+'</p></div>'
+    +'<div class="fsl-course-section"><h3>'+l('自分で新しい文をつくる','Create your own sentence','Créer sa propre phrase')+'</h3>'
+    +'<p class="fsl-course-task">'+esc(practice)+'</p>'
+    +'<label class="field-label" for="courseDraft">'+l('フランス語で書いてください','Write in French','Écrivez en français')+'</label>'
+    +'<textarea id="courseDraft" class="fsl-course-draft" rows="3" maxlength="2500" placeholder="Écrivez votre phrase ici…">'+esc(note)+'</textarea>'
+    +'<div class="fsl-course-draft-foot"><span>'+l('端末内に自動保存。自動採点はしません。','Saved locally; not auto-graded.','Enregistré sur cet appareil, sans notation automatique.')+'</span>'
+    +'<button class="small-btn" type="button" data-action="save-course-draft">'+l('保存','Save','Enregistrer')+'</button></div></div>'
+    +'<div class="fsl-course-links"><strong>'+l('関連する単元','Connected lessons','Leçons liées')+'</strong><div class="actions">'
+    +links.map(v=>'<button type="button" class="secondary-btn" data-unit="'+esc(v.id)+'">'+esc(courseTitle(v))+'</button>').join('')+'</div></div>'
+    +'<p class="fsl-course-progress">'+l('この単元の演習','Exercises in this unit','Exercices de cette unité')+'：'+study+'/'+u.items.length+'</p></section>';
+  }
+    function renderCourses(){
     const units=FSL_CURRICULUM.units;
     const active=units.find(u=>u.id===state.selectedUnit&&u.level===state.level)||levelUnits()[0];
     if(!active)return;
@@ -173,20 +204,20 @@
     const pills=validLevels.map(level=>{
       const items=questionBank().filter(q=>levelOf(q)===level);
       const studied=items.filter(q=>state.progress[q.id]?.attempts>0).length;
-      return `<button type="button" class="level-card ${state.level===level?'selected':''}" data-level="${level}" aria-pressed="${state.level===level}"><strong>${level}</strong><span>${esc(jp()?localizedLevel(level).ja:localizedLevel(level).en)}</span><small>${studied}/${items.length} ${tx('問題に挑戦','questions tried')}</small></button>`;
+      return `<button type="button" class="level-card ${state.level===level?'selected':''}" data-level="${level}" aria-pressed="${state.level===level}"><strong>${level}</strong><span>${esc(state.lang==='fr'?localizedLevel(level).fr:jp()?localizedLevel(level).ja:localizedLevel(level).en)}</span><small>${studied}/${items.length} ${tx('問題に挑戦','questions tried')}</small></button>`;
     }).join('');
     const unitButtons=levelUnits().map(u=>{
       const studied=u.items.filter(q=>state.progress[q.id]?.attempts>0).length;
       const checked=state.readings[u.id]?.count||0;
-      return `<button type="button" class="unit-card ${active.id===u.id?'selected':''}" data-unit="${u.id}"><strong>${esc(jp()?u.titleJa:u.titleEn)}</strong><span>${studied}/${u.items.length} ${tx('問題','questions')} · ${checked?tx('読解済み','read'):'—'}</span></button>`;
+      return `<button type="button" class="unit-card ${active.id===u.id?'selected':''}" data-unit="${u.id}"><strong>${esc(courseTitle(u))}</strong><span>${studied}/${u.items.length} ${tx('問題','questions')} · ${checked?tx('読解済み','read'):'—'}</span></button>`;
     }).join('');
     const rank=localizedLevel(state.level);
     const previews=active.items.map((q,i)=>`<div class="unit-preview"><b>${i+1}. ${esc(q.prompt)}</b>${state.lang==='fr'?`<span lang="fr">${esc(FSL_IMMERSION.readingPrompt(state.level,immersionHistory(state.level)))}</span>`:`<span>${esc(jp()?q.ja:q.en)}</span>`}</div>`).join('');
-    $('#content').innerHTML=`<section class="panel"><p class="kicker">SIX-LEVEL CURRICULUM · A1—C2</p><div class="section-head"><div><h2>${tx('レベル別のフランス語教材','French by proficiency level')}</h2><p class="subtle">${tx('各レベル3ユニット。短い読解・構造の解説・4問の確認問題を収録。','Three units per level: reading, structure notes, four questions.')}</p></div><span class="pill green">${FSL_CURRICULUM.questions.length} ${tx('追加問題','new questions')}</span></div><div class="level-grid">${pills}</div></section>
-      <section class="panel"><div class="section-head"><div><p class="kicker">${state.level} · ${esc(jp()?rank.ja:rank.en)}</p><h2>${esc(jp()?rank.descJa:rank.descEn)}</h2></div></div><div class="unit-grid">${unitButtons}</div><div class="divider"></div>
-      <div class="study-reading"><div class="between"><span class="pill">READ · ${state.level}</span><button class="small-btn" type="button" data-action="listen-reading">♪ ${tx('フランス語音声','Read aloud')}</button></div><h3>${esc(jp()?active.titleJa:active.titleEn)}</h3><div class="reading-text fr" lang="fr">${esc(active.reading)}</div>${state.lang==='fr'?`<div class="fsl-immersion-note" lang="fr"><span class="fsl-fr-focus">${esc(FSL_IMMERSION.plan(state.level,immersionHistory(state.level)).target)}</span> ${esc(FSL_IMMERSION.readingPrompt(state.level,immersionHistory(state.level)))}</div>${FSL_LANG.support(active.translationJa+'\n'+active.goalJa,active.translationEn+'\n'+active.goalEn)}`:`<p class="reading-translation">${esc(jp()?active.translationJa:active.translationEn)}</p><p class="subtle">${esc(jp()?active.goalJa:active.goalEn)}</p>`}<div class="focus-box"><strong>${tx('構造の手がかり','Structure focus')}</strong>${immersion(active.focusJa,state.level,active.focusJa,active.focusEn)}</div><div class="actions"><button class="secondary-btn" type="button" data-action="read-complete">${state.readings[active.id]?.count?'✓ '+tx('読解をもう一度記録','Record another reading'):tx('読んだことを記録','Mark reading done')}</button></div></div>
-      <h3 class="unit-heading">${tx('確認問題のテーマ','Practice questions')}</h3><div class="unit-previews">${previews}</div><div class="duration-row"><label class="control">${tx('学習時間の目安','Session target')}<select id="durationSelect">${[3,10,15,25,45].map(n=>`<option value="${n}" ${state.targetMinutes===n?'selected':''}>${n}${tx('分',' min')}</option>`).join('')}</select></label><small>${tx('所要時間は目安。時間になっても自動終了しません。','A target only; sessions never stop automatically.')}</small></div><div class="actions"><button class="primary-btn" type="button" data-action="start-unit">${tx('このユニットを4問練習','Practice this unit (4)')}</button><button class="secondary-btn" type="button" data-action="start-daily">${state.level} ${tx('の10問を練習','mixed practice (10)')}</button><button class="ghost-btn" type="button" data-action="start-quick">${tx('3問で短時間復習','Quick 3 questions')}</button></div>
-      <p class="notice">${tx('CEFRに沿った学習開始用の教材です。この問題数の達成だけで該当レベルを習得した判定にはなりません。','Starter material aligned with CEFR skills—not an official proficiency or certification assessment.')}</p></section>`;
+    $('#content').innerHTML=`<section class="panel"><p class="kicker">SIX-LEVEL CURRICULUM · A1—C2</p><div class="section-head"><div><h2>${tx('レベル別のフランス語教材','French by proficiency level')}</h2><p class="subtle">${state.lang==='fr'?`Neuf unités par niveau, avec compréhension, grammaire, comparaison, expression et exercices.`:`${levelUnits().length} ${tx('単元。場面読解、文の構造、対比、作文、4問演習を通して学びます。','units: reading, structure, contrast, writing and four exercises each.')}`}</p></div><span class="pill green">${FSL_CURRICULUM.questions.length} ${tx('講座の確認問題','course questions','questions du parcours')}</span></div><div class="level-grid">${pills}</div></section>
+      <section class="panel"><div class="section-head"><div><p class="kicker">${state.level} · ${esc(state.lang==='fr'?rank.fr:jp()?rank.ja:rank.en)}</p><h2>${esc(state.lang==='fr'?rank.descFr:jp()?rank.descJa:rank.descEn)}</h2></div></div><div class="unit-grid">${unitButtons}</div><div class="divider"></div>
+      <div class="study-reading"><div class="between"><span class="pill">READ · ${state.level}</span><div class="actions"><button class="small-btn" type="button" data-action="listen-reading">♪ ${tx('フランス語音声','Read aloud','Écouter')}</button><button class="small-btn" type="button" data-action="toggle-course-reading">${state.courseReadingMasked?tx('文章を表示','Reveal text','Afficher le texte'):tx('文章を隠して聴く','Listen without text','Écouter sans lire')}</button></div></div><h3>${esc(courseTitle(active))}</h3>${state.courseReadingMasked?`<div class="fsl-course-listen-mask">${tx("文字を見ずに音を聴き、場面を思い浮かべてください。","Listen first and picture the scene.","Écoutez d’abord, puis imaginez la scène.")}</div>`:`<div class="reading-text fr" lang="fr">${esc(active.reading)}</div>`}${state.courseReadingMasked?``:state.lang==='fr'?`<div class="fsl-immersion-note" lang="fr"><span class="fsl-fr-focus">${esc(FSL_IMMERSION.plan(state.level,immersionHistory(state.level)).target)}</span> ${esc(FSL_IMMERSION.readingPrompt(state.level,immersionHistory(state.level)))}</div>${FSL_LANG.support(active.translationJa+'\n'+active.goalJa,active.translationEn+'\n'+active.goalEn)}`:`<p class="reading-translation">${esc(jp()?active.translationJa:active.translationEn)}</p><p class="subtle">${esc(jp()?active.goalJa:active.goalEn)}</p>`}<div class="focus-box"><strong>${tx('構造の手がかり','Structure focus')}</strong>${immersion(active.focusJa,state.level,active.focusJa,active.focusEn)}</div><div class="actions"><button class="secondary-btn" type="button" data-action="read-complete">${state.readings[active.id]?.count?'✓ '+tx('読解をもう一度記録','Record another reading'):tx('読んだことを記録','Mark reading done')}</button></div></div>
+      ${courseDeepDive(active)}<h3 class="unit-heading">${tx('確認問題のテーマ','Practice questions','Questions de vérification')}</h3><div class="unit-previews">${previews}</div><div class="duration-row"><label class="control">${tx('学習時間の目安','Session target')}<select id="durationSelect">${[3,10,15,25,45].map(n=>`<option value="${n}" ${state.targetMinutes===n?'selected':''}>${n}${tx('分',' min')}</option>`).join('')}</select></label><small>${tx('所要時間は目安。時間になっても自動終了しません。','A target only; sessions never stop automatically.')}</small></div><div class="actions"><button class="primary-btn" type="button" data-action="start-unit">${tx('このユニットを4問練習','Practice this unit (4)','Faire les 4 exercices de cette unité')}</button><button class="secondary-btn" type="button" data-action="start-daily">${state.level} ${tx('の10問を練習','mixed practice (10)')}</button><button class="ghost-btn" type="button" data-action="start-quick">${tx('3問で短時間復習','Quick 3 questions')}</button></div>
+      <p class="notice">${tx('CEFRを参考に構成した独自教材です。問題への正解だけでCEFRレベルの習得を認定するものではありません。','This is an independent CEFR-inspired course, not a level certification.','Ce parcours s’inspire du CECR ; la réussite aux questions n’est pas une certification de niveau.')}</p></section>`;
   }
   function renderRecords(){
     const events=state.events.filter(e=>e.type==='answer');
@@ -253,16 +284,17 @@ Preserve French spelling, accents, apostrophes, and original word order. Include
   function exportCards(){const records=questionBank().map(q=>({id:q.id,sourceApp:'French Structure Lab',language:'fr',front:q.prompt,back:q.sentence+'\n'+(jp()?q.whyJa:q.whyEn),category:q.category,level:levelOf(q),unitId:q.unit||null,progress:state.progress[q.id]||null}));exportFile('french-structure-lab-cards.json',JSON.stringify({format:'learning-cards',version:'1.0',exportedAt:new Date().toISOString(),cards:records},null,2),'application/json');}
   function examBackupData(){return{version:'1.0',progress:read('examProgress',{}),attempts:read('examAttempts',[]),sessions:read('examSessions',[]),grade:read('examGrade','2')};}
   function cognitionBackupData(){return{version:'1.0',attempts:read('cognitionAttempts',[]),active:read('cognitionActive',null)};}
-  function exportBackup(){exportFile('french-structure-lab-backup.json',JSON.stringify({format:'fsl-backup',schemaVersion:APP_VERSION,exportedAt:new Date().toISOString(),progress:state.progress,activity:state.activity,exercises:state.userQuestions,sentences:state.userSentences,events:state.events,sessions:state.sessions,activeSession:state.activeSession,fuzzy:state.fuzzy,readings:state.readings,level:state.level,immersionDepth:FSL_IMMERSION.getDepth(),exam:examBackupData(),cognition:cognitionBackupData()},null,2),'application/json');} 
-  function exportAIReport(){const report=insights.exportForAI({questions:questionBank().map(q=>({...q,level:levelOf(q)})),progress:state.progress,events:state.events,sessions:state.sessions,fuzzy:state.fuzzy,level:state.level});report.futsuken=examBackupData();report.cognition=cognitionBackupData();report.immersionDepth=FSL_IMMERSION.getDepth();exportFile('french-structure-lab-ai-report.json',JSON.stringify(report,null,2),'application/json');} 
+  function exportBackup(){exportFile('french-structure-lab-backup.json',JSON.stringify({format:'fsl-backup',schemaVersion:APP_VERSION,exportedAt:new Date().toISOString(),progress:state.progress,activity:state.activity,exercises:state.userQuestions,sentences:state.userSentences,events:state.events,sessions:state.sessions,activeSession:state.activeSession,fuzzy:state.fuzzy,readings:state.readings,courseDrafts:state.courseDrafts,level:state.level,immersionDepth:FSL_IMMERSION.getDepth(),exam:examBackupData(),cognition:cognitionBackupData()},null,2),'application/json');} 
+  function exportAIReport(){const report=insights.exportForAI({questions:questionBank().map(q=>({...q,level:levelOf(q)})),progress:state.progress,events:state.events,sessions:state.sessions,fuzzy:state.fuzzy,level:state.level});report.futsuken=examBackupData();report.cognition=cognitionBackupData();report.immersionDepth=FSL_IMMERSION.getDepth();report.courseDrafts=state.courseDrafts;exportFile('french-structure-lab-ai-report.json',JSON.stringify(report,null,2),'application/json');} 
   function exportHistoryCSV(){const rows=[['日時','イベント','レベル','問題ID','正誤','選択','正解','復習']];state.events.filter(x=>x.type==='answer').forEach(e=>rows.push([e.at,e.type,e.level,e.questionId,e.correct?'1':'0',String(e.choice),String(e.solution),e.review?'1':'0']));exportFile('french-study-history.csv','\ufeff'+rows.map(r=>r.map(csv).join(',')).join('\r\n'),'text/csv;charset=utf-8');}
   function importBackup(raw){
     if(raw.length>3000000)throw Error(tx('バックアップが大きすぎます','Backup is too large'));
     const b=JSON.parse(raw);if(!b||b.format!=='fsl-backup'||!b.progress||typeof b.progress!=='object'||Array.isArray(b.progress)||!b.activity||typeof b.activity!=='object')throw Error(tx('学習バックアップではありません','Not a valid FSL backup'));
     if(!Array.isArray(b.exercises)||!Array.isArray(b.sentences)||!b.exercises.every(validateExercise)||!b.sentences.every(validateSentence))throw Error(tx('バックアップの教材データが不正です','Invalid lessons in backup'));
     for(const prop of ['events','sessions'])if(b[prop]!==undefined&&!Array.isArray(b[prop]))throw Error(tx('履歴データが不正です','Invalid history data'));
+    if(b.courseDrafts!==undefined&&(!b.courseDrafts||typeof b.courseDrafts!=='object'||Array.isArray(b.courseDrafts)||Object.values(b.courseDrafts).some(x=>typeof x!=='string'||x.length>2500)))throw Error('Invalid course draft data');
     if(!confirm(tx('現在の学習記録をこのバックアップで置き換えます。先に現在の記録を書き出しましたか？','Replace current study records with this backup? Consider exporting first.')))return;
-    const fields={progress:b.progress,activity:b.activity,userQuestions:b.exercises,userSentences:b.sentences,events:(b.events||[]).slice(-10000),sessions:(b.sessions||[]).slice(-500),activeSession:null,fuzzy:b.fuzzy||{},readings:b.readings||{},level:validLevels.includes(b.level)?b.level:'B1'};
+    const fields={progress:b.progress,activity:b.activity,userQuestions:b.exercises,userSentences:b.sentences,events:(b.events||[]).slice(-10000),sessions:(b.sessions||[]).slice(-500),activeSession:null,fuzzy:b.fuzzy||{},readings:b.readings||{},courseDrafts:b.courseDrafts||state.courseDrafts,level:validLevels.includes(b.level)?b.level:'B1'};
     if(b.exam!==undefined){
       const e=b.exam;
       if(!e||!e.progress||typeof e.progress!=='object'||Array.isArray(e.progress)||!Array.isArray(e.attempts)||!Array.isArray(e.sessions))throw Error(tx('仏検のバックアップ形式が不正です','Invalid exam backup data'));
@@ -313,11 +345,12 @@ Preserve French spelling, accents, apostrophes, and original word order. Include
   $('#languageSelect').addEventListener('change',ev=>{if(!FSL_LANG.set(ev.target.value))return;state.lang=FSL_LANG.get();render();});
   $('#immersionPanelSelect').addEventListener('change',ev=>{if(FSL_IMMERSION.setDepth(ev.target.value))render();});
   $('#levelSelect').addEventListener('change',e=>{if(!validLevels.includes(e.target.value))return;const level=e.target.value;if(state.activeSession)finishSession(false);state.level=level;save('level',state.level);const u=levelUnits()[0];if(u){state.selectedUnit=u.id;save('unit',u.id);}setView('courses');});
+  $('#content').addEventListener('input',e=>{if(e.target?.id==='courseDraft'&&state.selectedUnit){state.courseDrafts[state.selectedUnit]=e.target.value.slice(0,2500);save('courseDrafts',state.courseDrafts);}});
   $('#content').addEventListener('click',e=>{
     const option=e.target.closest('[data-answer]');
     if(option && state.sessionAnswer===null){const q=questionById(state.session[state.sessionIndex]);if(!q)return;state.sessionAnswer=Number(option.dataset.answer);markAnswer(q,state.sessionAnswer===q.answer);renderToday();return;}
     const lc=e.target.closest('[data-level]');if(lc){if(state.activeSession){finishSession(false);}state.level=lc.dataset.level;save('level',state.level);const u=levelUnits()[0];if(u){state.selectedUnit=u.id;save('unit',u.id);}renderCourses();updateHeader();return;}
-    const uc=e.target.closest('[data-unit]');if(uc){state.selectedUnit=uc.dataset.unit;save('unit',state.selectedUnit);renderCourses();return;}
+    const uc=e.target.closest('[data-unit]');if(uc){state.selectedUnit=uc.dataset.unit;state.courseReadingMasked=false;save('unit',state.selectedUnit);renderCourses();return;}
     const sb=e.target.closest('[data-sentence]');if(sb){state.selectedSentence=sb.dataset.sentence;state.selectedToken=0;renderAnalysis();return;}
     const tb=e.target.closest('[data-token]');if(tb){state.selectedToken=Number(tb.dataset.token);record('word_touch',{sentenceId:state.selectedSentence,tokenIndex:state.selectedToken});renderAnalysis();return;}
     const sf=e.target.closest('[data-speak-form]');if(sf){const v=FSL_DATA.verbs.find(v=>v.id===state.selectedVerb);const f=conjugation(v,state.selectedTense)[Number(sf.dataset.speakForm)];speak(personForm(persons[Number(sf.dataset.speakForm)],f,state.selectedTense));return;}
@@ -331,6 +364,8 @@ Preserve French spelling, accents, apostrophes, and original word order. Include
       case 'toggle-fuzzy':{const q=questionById(state.session[state.sessionIndex]);if(!q)return;state.fuzzy[q.id]=!state.fuzzy[q.id];save('fuzzy',state.fuzzy);record('fuzzy_changed',{questionId:q.id,unclear:state.fuzzy[q.id]});renderToday();break;}
       case 'start-quick':startAt('quick',distributed(levelQuestions()).slice(0,3).map(q=>q.id));break;
       case 'start-unit':{const u=FSL_CURRICULUM.units.find(x=>x.id===state.selectedUnit);if(u){state.level=u.level;save('level',u.level);startAt('unit',u.items.map(q=>q.id));}break;}
+      case 'toggle-course-reading':state.courseReadingMasked=!state.courseReadingMasked;renderCourses();break;
+      case 'save-course-draft':{const u=state.selectedUnit;const el=$('#courseDraft');if(u&&el){state.courseDrafts[u]=el.value.slice(0,2500);save('courseDrafts',state.courseDrafts);toast(tx('自分の文を保存しました','Your sentence has been saved','Votre phrase est enregistrée'));}break;}
       case 'read-complete':{const u=FSL_CURRICULUM.units.find(x=>x.id===state.selectedUnit);if(!u)break;state.readings[u.id]={count:(state.readings[u.id]?.count||0)+1,last:new Date().toISOString()};save('readings',state.readings);record('reading_completed',{unitId:u.id});renderCourses();break;}
       case 'listen-reading':{const u=FSL_CURRICULUM.units.find(x=>x.id===state.selectedUnit);if(u){speak(u.reading);record('listened',{unitId:u.id});}break;}
       case 'export-history':exportHistoryCSV();break;
